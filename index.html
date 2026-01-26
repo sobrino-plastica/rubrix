@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rúbricas – Evaluación por clase</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+body { font-family: 'Raleway', sans-serif; background: #f6f7f9; padding: 24px; }
+
+/* CARDS */
+.card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 24px; }
+h1 { margin-top:0; }
+
+/* BOTONES */
+.upload-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 20px; border-radius: 12px; border: 1.5px solid #d0d5dd;
+  cursor: pointer; background: white; font-weight: 600;
+}
+.upload-btn:hover { background:#f9fafb; }
+
+select, button, input[type=number] { padding: 10px; border-radius: 10px; font-family: 'Raleway'; margin-right: 10px; }
+button { border: 1.5px solid #d0d5dd; background: white; font-weight: 600; cursor: pointer; }
+button:hover { background:#f9fafb; }
+
+
+/* TABLA */
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 16px; overflow: hidden; }
+th, td { padding:14px; text-align:center; vertical-align:top; font-family: 'Raleway', sans-serif; }
+td { border-bottom: 1px solid #eee; cursor: pointer; transition: all 0.2s ease; }
+td:hover { filter: brightness(0.95); }
+td.criterio { background: #fafafa; font-weight: 600; text-align: left; min-width: 180px; cursor: default; }
+input.peso { width:70px; padding:6px; border-radius:8px; border:1px solid #ddd; text-align:center; font-family: 'Raleway'; }
+
+/* COLORES CABECERA */
+th.insuficiente { background: #ffcc80; }
+th.suficiente   { background: #fff59d; }
+th.bueno        { background: #dcedc8; }
+th.excelente    { background: #a5d6a7; }
+
+/* COLORES CELDAS */
+td.insuficiente { background: #ffe0b2; }
+td.suficiente   { background: #fff9c4; }
+td.bueno        { background: #e6f4ea; }
+td.excelente    { background: #d4edda; }
+
+/* CELDA SELECCIONADA */
+td.seleccionado.insuficiente { border: 2px solid #ff9800; font-weight:700; }
+td.seleccionado.suficiente   { border: 2px solid #fdd835; font-weight:700; }
+td.seleccionado.bueno        { border: 2px solid #8bc34a; font-weight:700; }
+td.seleccionado.excelente    { border: 2px solid #4caf50; font-weight:700; }
+
+/* NOTA FINAL */
+.nota-final {
+  margin: 24px auto 0 auto;
+  padding: 16px 28px;
+  max-width: 320px;
+  text-align: center;
+
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: 'Raleway', sans-serif;
+
+  background: #f1f8f5;
+  color: #1b5e20;
+
+  border: 2px solid #81c784;
+  border-radius: 18px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+
+/* AVISO SUMA DE PESOS */
+#avisoPesos {
+  margin-top:15px;
+  font-weight:700;
+  font-size:1rem;
+  color:#b71c1c;
+  background:#ffebee;
+  border:2px solid #ef5350;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+}
+.footer-simple {
+    color: #605e5e;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+td:active {
+  transform: scale(0.97);
+}
+td.seleccionado {
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.15);
+}
+@media (pointer: coarse) {
+  button {
+    padding: 14px 18px;
+    font-size: 1rem;
+  }
+
+  select {
+    font-size: 1rem;
+    padding: 12px;
+  }
+}
+th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+
+
+/* RESPONSIVE */
+@media (max-width:900px){ select, button, input[type=number]{ width:100%; margin-bottom:10px; } }
+@media (pointer: coarse) {
+  td {
+    min-height: 70px;
+    font-size: 1.05rem;
+  }
+
+  td.criterio {
+    font-size: 1.1rem;
+  }
+
+  th {
+    font-size: 1.05rem;
+  }
+}
+
+</style>
+</head>
+
+<body>
+  <div style="
+  position: fixed;
+  top: -1px;
+  right: 40px;
+">
+  <img
+    src="rubrix_logo.png"
+    alt="rubriX"
+    style="
+      height: 72px;
+      width: auto;
+      display: block;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.65));
+
+    "
+  />
+</div>
+<div id="fullscreenBadge" style="
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  background: #000;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  display: none;
+  opacity: 0.8;
+  z-index: 999;
+">
+  Pantalla completa
+</div>
+
+  <div style="display:flex; gap:24px; flex-wrap:wrap; margin-bottom:24px;">
+
+  <!-- GESTIÓN DE CLASES -->
+  <div class="card" style="flex:1; min-width:280px;">
+    <h1>
+      <!-- Icono minimalista -->
+      <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin-right:8px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a5568" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+      Gestión de clases
+    </h1>
+    <label class="upload-btn">
+      ＋ Importar clase
+      <input type="file" accept=".xlsx" hidden onchange="importarClase(event)">
+    </label>
+  </div>
+
+  <!-- CARGAR RÚBRICA -->
+  <div class="card" style="flex:1; min-width:280px;">
+    <h1>
+      <!-- Icono minimalista de rúbrica -->
+      <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin-right:8px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a5568" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="3" y1="9" x2="21" y2="9"></line>
+        <line x1="3" y1="15" x2="21" y2="15"></line>
+      </svg>
+      Importar rúbrica
+    </h1>
+    <label class="upload-btn">
+      ＋ Subir archivo
+      <input type="file" accept=".xlsx" hidden onchange="cargarRubrica(event)">
+    </label>
+    <span class="pdf-label" id="nombreArchivoRubrica">—</span>
+  </div>
+
+</div>
+
+
+<div class="card">
+  Clase:
+  <select id="selectorClase" onchange="cargarAlumnos()"></select>
+
+  Alumno/a:
+  <select id="selectorAlumno" onchange="cargarEvaluacion()"></select>
+  <button onclick="alumnoAnterior()">← Alumno anterior</button>
+  <button onclick="siguienteAlumno()">Siguiente alumno →</button>
+
+  <button onclick="exportarPDF()">📄 PDF alumno</button>
+  <button onclick="exportarExcelClase()">📊 Exportar notas</button>
+
+
+
+</div>
+
+<div class="card">
+  <div style="overflow-x:auto;">
+    <table id="tablaRubrica"></table>
+  </div>
+  <div id="avisoPesos" style="display:none;"></div>
+  <div class="nota-final" id="notaFinal">Nota final: —</div>
+</div>
+
+
+<script>
+let alumnoActualIndex = -1;
+let clases = JSON.parse(localStorage.getItem("clases")) || [];
+let rubrica = [];
+let nombreRubricaArchivo = '';
+let evaluaciones = JSON.parse(localStorage.getItem("evaluaciones")) || {};
+const niveles = ["excelente","bueno","suficiente","insuficiente"];
+
+document.addEventListener("fullscreenchange", () => {
+  const badge = document.getElementById("fullscreenBadge");
+  badge.style.display = document.fullscreenElement ? "block" : "none";
+});
+
+cargarSelectorClases();
+
+function importarClase(e){
+  const file=e.target.files[0];
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    const wb=XLSX.read(evt.target.result,{type:"binary"});
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    const alumnos=rows.map((r,i)=>({id:i+1,nombre:`${r.Nombre} ${r.Apellidos}`}));
+    const nombreClase=prompt("Nombre de la clase (ej: 1º ESO A)");
+    if(!nombreClase) return;
+    clases.push({id:nombreClase.replace(/\s+/g,"_"),nombre:nombreClase,alumnos});
+    localStorage.setItem("clases",JSON.stringify(clases));
+    cargarSelectorClases();
+    alert("Clase importada");
+  };
+  reader.readAsBinaryString(file);
+}
+
+function cargarRubrica(e){
+  const file=e.target.files[0];
+  nombreRubricaArchivo=file.name;
+  document.getElementById("nombreArchivoRubrica").innerText=nombreRubricaArchivo;
+
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    const wb=XLSX.read(evt.target.result,{type:"binary"});
+    const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+
+    rubrica = raw.map(r=>{
+      const txt = {};
+      niveles.forEach(k=>{
+        txt[k] = (r[k.charAt(0).toUpperCase()+k.slice(1)] || "").toString().trim();
+      });
+      return {
+        criterio: (r["Criterio"] || "").toString().trim(),
+        peso: Number(r["Peso"] || 100/raw.length),
+        textos: txt
+      };
+    });
+    alert("Rúbrica cargada correctamente");
+  };
+  reader.readAsBinaryString(file);
+}
+
+function cargarSelectorClases(){
+  const sel=document.getElementById("selectorClase");
+  sel.innerHTML=`<option value="">Selecciona clase</option>`;
+  clases.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.nombre}</option>`);
+}
+
+function cargarAlumnos(){
+  const sel = document.getElementById("selectorAlumno");
+  const clase = clases.find(c => c.id === selectorClase.value);
+
+  sel.innerHTML = `<option value="">Selecciona alumno</option>`;
+  alumnoActualIndex = -1;
+
+  clase?.alumnos.forEach((a, index) => {
+    sel.innerHTML += `<option value="${a.id}">${a.nombre}</option>`;
+  });
+}
+
+
+function cargarEvaluacion(){
+  const selector = document.getElementById("selectorAlumno");
+  alumnoActualIndex = selector.selectedIndex - 1; // -1 por la opción placeholder
+
+  if (alumnoActualIndex < 0) return;
+
+  construirTabla();
+  mostrarSeleccion();
+}
+function alumnoAnterior() {
+  const selector = document.getElementById("selectorAlumno");
+  const opciones = Array.from(selector.options).slice(1); // sin placeholder
+
+  if (opciones.length === 0) {
+    alert("No hay alumnos cargados");
+    return;
+  }
+
+  let actual = selector.value;
+
+  // si no hay alumno seleccionado, ir al último
+  if (!actual) {
+    selector.value = opciones[opciones.length - 1].value;
+    cargarEvaluacion();
+    return;
+  }
+
+  const index = opciones.findIndex(o => o.value === actual);
+
+  if (index === -1) {
+    selector.value = opciones[opciones.length - 1].value;
+    cargarEvaluacion();
+    return;
+  }
+
+  if (index > 0) {
+    selector.value = opciones[index - 1].value;
+    cargarEvaluacion();
+  } else {
+    alert("Ya estás en el primer alumno");
+  }
+}
+function alumnoAnterior() {
+  const selector = document.getElementById("selectorAlumno");
+  const opciones = Array.from(selector.options).slice(1); // sin placeholder
+
+  if (opciones.length === 0) {
+    alert("No hay alumnos cargados");
+    return;
+  }
+
+  let actual = selector.value;
+
+  // si no hay alumno seleccionado, ir al último
+  if (!actual) {
+    selector.value = opciones[opciones.length - 1].value;
+    cargarEvaluacion();
+    return;
+  }
+
+  const index = opciones.findIndex(o => o.value === actual);
+
+  if (index === -1) {
+    selector.value = opciones[opciones.length - 1].value;
+    cargarEvaluacion();
+    return;
+  }
+
+  if (index > 0) {
+    selector.value = opciones[index - 1].value;
+    cargarEvaluacion();
+  } else {
+    alert("Ya estás en el primer alumno");
+  }
+}
+
+function siguienteAlumno() {
+  const selector = document.getElementById("selectorAlumno");
+  const opciones = Array.from(selector.options).slice(1); // sin placeholder
+
+  if (opciones.length === 0) {
+    alert("No hay alumnos cargados");
+    return;
+  }
+
+  let actual = selector.value;
+
+  // si no hay alumno seleccionado, ir al primero
+  if (!actual) {
+    selector.value = opciones[0].value;
+    cargarEvaluacion();
+    return;
+  }
+
+  const index = opciones.findIndex(o => o.value === actual);
+
+  if (index === -1) {
+    selector.value = opciones[0].value;
+    cargarEvaluacion();
+    return;
+  }
+
+  if (index < opciones.length - 1) {
+    selector.value = opciones[index + 1].value;
+    cargarEvaluacion();
+  } else {
+    alert("Ya estás en el último alumno");
+  }
+}
+
+
+
+function construirTabla(){
+  const tabla=document.getElementById("tablaRubrica");
+  tabla.innerHTML=`
+    <tr>
+      <th>Criterio</th>
+      <th class="excelente">Excelente</th>
+<th class="bueno">Bueno</th>
+<th class="suficiente">Suficiente</th>
+<th class="insuficiente">Insuficiente</th>
+      <th>Peso (%)</th>
+      <th>Nota</th>
+    </tr>
+  `;
+  rubrica.forEach((c,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td class="criterio">${c.criterio}</td>
+      ${niveles.map(n=>`<td class="${n}" onclick="seleccionar(${i},'${n}')">${c.textos[n]}</td>`).join('')}
+      <td><input type="number" value="${c.peso}" min="0" max="100" onchange="actualizarPeso(${i},this.value)"></td>
+      <td id="nota${i}">—</td>
+    `;
+    tabla.appendChild(tr);
+  });
+  calcularNota();
+}
+
+function actualizarPeso(i,valor){
+  rubrica[i].peso=Number(valor);
+  calcularNota();
+}
+
+function seleccionar(criterio,nivel){
+  const claseId=selectorClase.value;
+  const alumnoId=selectorAlumno.value;
+  if(!claseId||!alumnoId) return;
+
+  evaluaciones[claseId]??={};
+  evaluaciones[claseId][alumnoId]??=[];
+
+  const textoNivel = rubrica[criterio].textos[nivel] || "";
+  const valorNivel = niveles.indexOf(nivel);
+
+  evaluaciones[claseId][alumnoId][criterio]={
+    nivel:nivel,
+    texto:textoNivel,
+    valor:valorNivel
+  };
+
+  localStorage.setItem("evaluaciones",JSON.stringify(evaluaciones));
+  mostrarSeleccion();
+  calcularNota();
+}
+
+function mostrarSeleccion(){
+  document.querySelectorAll("#tablaRubrica td").forEach(td=>td.classList.remove("seleccionado","negrita"));
+  const datos=evaluaciones[selectorClase.value]?.[selectorAlumno.value];
+  if(!datos) return;
+  datos.forEach((d,i)=>{
+    if(!d) return;
+    const celda = tablaRubrica.rows[i+1].cells[d.valor+1];
+    celda.classList.add("seleccionado", d.nivel);
+  });
+}
+
+function calcularNota(){
+  const datos=evaluaciones[selectorClase.value]?.[selectorAlumno.value] || [];
+  let sumaNotas=0, sumaPesos=0;
+
+  rubrica.forEach((c,i)=>{
+    sumaPesos += c.peso;
+    if(datos[i]){
+      const d = datos[i];
+      const notaNivel = ((3 - d.valor) / 3 * 10) * c.peso / 100; // Nota escala 0-10
+      sumaNotas += notaNivel;
+      document.getElementById(`nota${i}`).innerText = notaNivel.toFixed(2);
+    } else {
+      document.getElementById(`nota${i}`).innerText = "—";
+    }
+  });
+
+  // Aviso pesos
+  const aviso = document.getElementById("avisoPesos");
+if(sumaPesos !== 100){
+  aviso.innerText = `⚠️ La suma de los pesos es ${sumaPesos}%. Debe ser 100%.`;
+  aviso.style.display = "block"; // mostrar
+} else {
+  aviso.style.display = "none"; // ocultar si todo correcto
+}
+
+  const notaFinal = sumaPesos !== 0 ? (sumaNotas).toFixed(2) : "—";
+  document.getElementById("notaFinal").innerText = `Nota final: ${notaFinal}`;
+}
+
+function exportarPDF(){
+  if(!rubrica.length){
+    alert("Carga primero una rúbrica");
+    return;
+  }
+
+  const clase = clases.find(c=>c.id===selectorClase.value);
+  const alumno = clase?.alumnos.find(a=>a.id==selectorAlumno.value);
+  const datos = evaluaciones[clase.id]?.[alumno.id];
+
+  if(!alumno || !datos){
+    alert("Selecciona un alumno evaluado");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 18;
+  const nombreRubricaSinExtension = nombreRubricaArchivo.replace(/\.[^/.]+$/, "");
+
+  /* CABECERA */
+  doc.setFontSize(14);
+  doc.setFont(undefined,"bold");
+  doc.text(`Rúbrica: ${nombreRubricaSinExtension}`,10,y);y+=8;
+  doc.text(`Alumno/a: ${alumno.nombre}`, 10, y); y+=8;
+  doc.text(`Clase: ${clase.nombre}`, 10, y); y+=12;
+
+  doc.setFontSize(11);
+  doc.setFont(undefined,"normal");
+
+  let notaFinal = 0;
+
+  rubrica.forEach((c,i)=>{
+    const d = datos[i];
+    if(!d) return;
+
+    // Criterio
+    doc.setFont(undefined,"bold");
+    doc.text(`Criterio: ${c.criterio} (${c.peso}%)`, 10, y);
+    y+=6;
+
+    doc.setFont(undefined,"normal");
+    doc.text(`Nivel alcanzado: ${d.nivel.toUpperCase()}`, 14, y);
+    y+=6;
+
+    const texto = d.texto || "";
+    const split = doc.splitTextToSize(texto, 180);
+    doc.text(split, 14, y);
+    y += split.length * 5 + 4;
+
+    const nota = ((3 - d.valor) / 3 * 10) * c.peso / 100;
+    notaFinal += nota;
+
+    doc.setFont(undefined,"italic");
+    doc.text(`Nota lograda en el criterio: ${nota.toFixed(2)}`, 14, y);
+    doc.setFont(undefined,"normal");
+    y+=8;
+
+    doc.line(10, y, 200, y);
+    y+=8;
+
+    if(y > 260){
+      doc.addPage();
+      y = 20;
+    }
+  });
+
+  /* RECUADRO NOTA FINAL */
+  doc.setFontSize(14);
+  doc.setFont(undefined,"bold");
+
+  const boxX = 35;
+  const boxY = y + 8;
+  const boxW = 140;
+  const boxH = 18;
+
+  doc.roundedRect(boxX, boxY, boxW, boxH, 6, 6);
+  doc.text(
+    `NOTA FINAL: ${notaFinal.toFixed(2)} / 10`,
+    boxX + boxW / 2,
+    boxY + 12,
+    { align: "center" }
+  );
+
+  doc.save(`${alumno.nombre}_rubrica.pdf`);
+}
+
+
+function exportarExcelClase(){
+  if(!rubrica.length){alert("Carga primero una rúbrica");return;}
+  const clase=clases.find(c=>c.id===selectorClase.value);
+  if(!clase) return;
+  const filas = [];
+  filas.push([`Rúbrica: ${nombreRubricaArchivo}`]);
+  filas.push([]);
+  filas.push(["Alumno","Nota"]);
+  clase.alumnos.forEach(a=>{
+    const datos = evaluaciones[clase.id]?.[a.id] || [];
+    let sumaNotas=0, sumaPesos=0;
+    rubrica.forEach((c,i)=>{
+      sumaPesos += c.peso;
+      if(datos[i]){
+        const d = datos[i];
+        const nota = ((3 - d.valor) / 3 * 10) * c.peso / 100;
+        sumaNotas += nota;
+      }
+    });
+    filas.push([a.nombre, sumaPesos !==0 ? sumaNotas.toFixed(2) : "—"]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(filas);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Notas");
+  XLSX.writeFile(wb,`${clase.nombre}_notas.xlsx`);
+}
+
+</script>
+<footer class="footer-simple">
+    <p>&copy; App diseñada por José Manuel Sobrino Carrasco · Creative Commons</p>
+</footer>
+</body>
+</html>
