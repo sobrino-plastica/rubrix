@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generador de SdA Educativas</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+html, body {margin:0; padding:0; height:100%; font-family:'Raleway', sans-serif; background:#f5f7fa;}
+body {display:flex; justify-content:center; align-items:center; min-height: 100vh;  /* asegura altura total */
+  position: relative;  /* contexto para footer fijo */}
+
+.container {display:flex; align-items:center; justify-content:center; width:100%;}
+
+.app {
+  position: relative;
+  width: 80%; max-width: 1000px; height: 80vh;
+  background:white; padding:30px 40px;
+  border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column; box-sizing:border-box;
+  overflow:hidden;
+}
+
+h1 {margin-top:0; font-size:38px; text-align:center; margin-bottom:20px;}
+
+#excelFile {display:none;}
+.upload-btn {
+  display:inline-block; padding:25px 50px; font-size:20px; font-weight:700;
+  color:#506fff; border:2px solid #2563eb; border-radius:20px;
+  cursor:pointer; text-align:center; background:white; transition:all 0.2s;
+}
+.upload-btn:hover {background:#ff751f; color:white;}
+
+#wizard {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-top: 0;   /* 🔑 sin separación */
+}
+
+h2 {
+  font-size: 20px;
+  margin: 10px 0 15px 0;   /* menos aire arriba */
+  color: #ff751f;
+}
+
+#stepContent {
+  flex-grow: 1;
+  min-height: 200px;
+  overflow-y: auto;
+  padding-right: 10px;
+  position: relative;
+}
+
+.step-inner {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.step-inner.visible {
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+}
+
+#copyBtn {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #c0c0c0;
+  border-radius: 8px;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+#copyBtn:hover {
+  background: #e0e0e0;
+  border-color: #999;
+}
+
+#copyBtn svg {
+  width: 24px;
+  height: 24px;
+  stroke: #555;
+}
+
+
+.chips {display:flex; flex-direction:column; gap:10px; align-items:stretch; width:100%;}
+.chip {
+  padding:15px 20px; border-radius:12px; border:1px solid #cbd5e1;
+  background:#f8fafc; cursor:pointer; transition:all 0.2s; font-size:18px;
+  width:100%; box-sizing:border-box; text-align:left;
+}
+.chip:hover {background:#e2e8f0;}
+.chip.active {background:#ff751f; color:white; border-color:#ffbd59; font-weight:600;}
+
+textarea {
+  display: block; /* asegura que se vea como bloque */
+  width: 100%;
+  height: 140px;
+  padding: 12px;
+  font-family: 'Raleway', sans-serif;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  box-sizing: border-box;
+  resize: none;
+}
+
+#resetBtn {
+  position:absolute; top:15px; right:15px; width:36px; height:36px; border-radius:50%;
+  border:2px solid #a1a1aa; background:#f5f5f5; display:flex; justify-content:center; align-items:center;
+  cursor:pointer; transition:all 0.2s;
+}
+#resetBtn:hover {background:#e0e0e0;}
+
+.nav-circle {
+  width:60px; height:60px; border-radius:50%; background:#ffbd59;
+  display:flex; justify-content:center; align-items:center; cursor:pointer;
+  box-shadow:2px 2px 5px #bebebe, -2px -2px 5px #ffffff; transition:all 0.2s;
+}
+.nav-circle:hover {
+  background:#ff751f;
+}
+.nav-circle svg {width:30px; height:30px; stroke:#fff; stroke-width:3; fill:none;}
+
+#resultado {width:80%; max-width:1000px; margin-top:20px; display:none;}
+#introScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  gap: 30px;
+}
+
+#introText {
+  font-family: 'Raleway', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #ff751f;
+  text-align: center;
+  margin-top: 45px;
+  margin-bottom: 75px;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 22px 40px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff751f;
+  border: 2px solid #ff751f;
+  border-radius: 20px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s;
+  width: auto;          /* 🔑 NO ocupa todo el ancho */
+}
+#fixedFooter {
+  position: fixed;      /* Fijo al viewport */
+  bottom: 0;            /* Pegado al borde inferior */
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Raleway', sans-serif;
+  font-size: 13px;
+  color: #94a3b8;
+  background: #f5f7fa;  /* opcional: mismo color de fondo de la página */
+  padding: 6px 0;
+  z-index: 1000;        /* encima de todo */
+  pointer-events: none; /* no interfiere con clicks */
+}
+
+
+
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="nav-circle" style="margin-right:15px;" onclick="prevStep()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </div>
+
+  <div class="app">
+    <div style="text-align:center; margin-bottom:20px;">
+  <img src="logo_sdamaker.png" alt="Generador de SdA educativas" style="max-height:60px; width:auto;">
+</div>
+
+
+
+<div id="introScreen">
+<div id="introText">
+SdAs competentes para profes competentes. ;)
+
+
+</div>
+
+
+
+<label for="excelFile" class="upload-btn">
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="none"
+  stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round"
+       style="margin-right:12px;">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="17 8 12 3 7 8"/>
+    <line x1="12" y1="3" x2="12" y2="15"/>
+  </svg>
+
+Cargar currículo
+</label>
+
+<input type="file" id="excelFile" accept=".xlsx" />
+</div>
+
+
+    <div id="wizard" class="hidden">
+      <h2 id="stepTitle"></h2>
+      <div id="stepContent"></div>
+    </div>
+
+
+
+    <div id="resultado">
+  <h2>Prompt generado</h2>
+  <div style="display:flex; align-items:flex-start; gap:10px;">
+    <textarea id="promptFinal" style="flex-grow:1;"></textarea>
+    <button id="copyBtn" onclick="copiarPrompt()" title="Copiar código">
+      <svg viewBox="0 0 24 24" width="24" height="24" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+
+    </button>
+  </div>
+</div>
+
+<button id="resetBtn" onclick="resetApp()" title="Reiniciar">
+  <svg viewBox="0 0 24 24" width="26" height="26"
+       fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="1 4 1 10 7 10"></polyline>
+    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+  </svg>
+</button>
+
+
+
+  </div>
+
+  <div class="nav-circle" style="margin-left:15px;" onclick="nextStep()">
+    <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"></polyline></svg>
+  </div>
+</div>
+
+
+<script>
+let workbook;
+let currentStep = 0;
+const respuestas = {};
+
+const steps = [
+  { sheet:"ROLES_SDA", title:"Adquiere el siguiente rol", multi:true },
+  { sheet:"QUE_QUIERES_HACER_SDA", title:"Quiero...", multi:false },
+  { sheet:"TITULO", title:"Título de la Situación de Aprendizaje", multi:false, combo:true, placeholder:"Escribe el título de la SdA..." },
+{ sheet:"JUSTIFICACION", title:"Justifica la realización de esta situación de aprendizaje", multi:false, combo:true, placeholder:"Escribe aquí tu justificación..." },
+  { sheet:"DESCRIPCION", title:"Te describo brevemente la actividad", text:true },
+  { sheet:"TEMPORALIZACION", title:"Estas actividades deben desarrollarse a lo largo de este número de sesiones (sesiones de 55 minutos). Desarrolla con detalle el contenido propuesto para cada una de estas sesiones. ", multi:true },
+  { sheet:"ESTRUCTURA", title:"Para la estructura de esta Situación de aprendizaje quiero seguir este orden de apartados (todos ellos deben estar incluidos claramente separados en el documento final de la Situación de aprendizaje)", multi:false },
+  { sheet:"SABERES_BASICOS_A", title:"Los saberes básicos del Bloque A que trabajaremos serán los siguientes", multi:true },
+  { sheet:"SABERES_BASICOS_B", title:"Los saberes básicos del Bloque B que trabajaremos serán los siguientes", multi:true },
+  { sheet:"SABERES_BASICOS_C", title:"Los saberes básicos del Bloque C que trabajaremos serán los siguientes", multi:true },
+  { sheet:"SABERES_BASICOS_D", title:"Los saberes básicos del Bloque D que trabajaremos serán los siguientes", multi:true },
+  { sheet:"COMPETENCIAS", title:"Los nuevos criterios de evaluación que generes para la rúbrica deben evaluar las siguientes competencias", multi:true },
+  { sheet:"CRITERIOS", title:"y los siguientes criterios", multi:true },
+  { sheet:"DESCRIPTORES_OPERATIVOS", title:"combinados con los siguientes descriptores operativos", multi:true },
+  { sheet:"METODOLOGIAS", title:"Para el desarrollo de esta Situación de aprendizaje quiero que propongas y desarrolles las actividades siguiendo estas metodologías", multi:false },
+{ sheet:"ACTIVIDADES", title:"Te describo brevemente el tipo de actividad y el nombre que quiero que tengan (opcional)", text:true },
+{ sheet:"ACTIVIDADES_REFUERZO_AMPLIACION", title:"Diseña y desarrolla las siguientes actividades extra", multi:true,},
+{ sheet:"ATENCION_DIVERSIDAD", title:"Incluye y desarrolla estas ideas de atención a la diversidad para los estudiantes siguiendo los Principios del DUA:", multi:true,},
+{ sheet:"RECURSOS_MATERIALES", title:"¿Qué recursos y materiales voy a utilizar para llevar a cabo la SdA?", multi:true, combo:true, placeholder:"Indica aquí algún material que quieras incluir aparte del que la IA incluirá. (Opcional)" },
+  { sheet:"OBJETIVOS_ETAPA", title:"En la generación de la situación de aprendizaje debes tener en cuenta los siguientes Objetivos de la Etapa", multi:true },
+  { sheet:"DESAFIOS_SIGLO_XXI", title:"y ten en cuenta los siguientes desafíos educativos del siglo XXI", multi:true },
+  { sheet:"ODS", title:"También los siguientes ODS", multi:true },
+  { sheet:"RESUMEN", title:"Para finalizar...", multi:false },
+  { sheet:"FORMATO_RUBRICA", title:"Con todos estos datos quiero que diseñes", multi:true,
+    manualOptions:["Una situación de aprendizaje","Una programación de aula para esta SdA"] }
+];
+
+
+/* ================= CARGA EXCEL ================= */
+
+document.getElementById("excelFile").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  Object.keys(respuestas).forEach(k => delete respuestas[k]);
+  currentStep = 0;
+
+  const reader = new FileReader();
+  reader.onload = evt => {
+    workbook = XLSX.read(new Uint8Array(evt.target.result), { type:"array" });
+    document.getElementById("introScreen").style.display = "none";
+    document.getElementById("wizard").classList.remove("hidden");
+    document.getElementById("resultado").style.display = "none";
+    mostrarPaso();
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+function mostrarPaso() {
+  const step = steps[currentStep];
+  const cont = document.getElementById("stepContent");
+  cont.innerHTML = ""; // limpiar paso anterior
+  cont.scrollTop = 0;   // reset scroll
+  document.getElementById("stepTitle").innerText = step.title;
+  document.getElementById("resultado").style.display = "none";
+
+  // Contenedor animado
+  const stepDiv = document.createElement("div");
+  stepDiv.className = "step-inner";
+  cont.appendChild(stepDiv);
+
+  // Renderizar contenido
+  if (step.text) {
+    renderTextarea(step, stepDiv);
+  } else {
+    renderChips(step, stepDiv);
+    if (step.combo) renderTextarea(step, stepDiv);
+  }
+
+  // Activar animación
+  requestAnimationFrame(() => stepDiv.classList.add("visible"));
+}
+
+function renderChips(step, cont) {
+  const chips = document.createElement("div");
+  chips.className = "chips";
+
+  let rows = [];
+  if (step.manualOptions) {
+    rows = step.manualOptions.map(t => ({ texto: t }));
+  } else {
+    rows = XLSX.utils.sheet_to_json(workbook.Sheets[step.sheet] || []);
+  }
+
+  rows.forEach(row => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.innerText = row.texto;
+
+    // Mantener activo si ya estaba seleccionado
+    if (step.combo) {
+      if (respuestas[step.sheet]?.opcion === row.texto) chip.classList.add("active");
+    } else if (step.multi) {
+      if (respuestas[step.sheet]?.includes(row.texto)) chip.classList.add("active");
+    } else {
+      if (respuestas[step.sheet] === row.texto) chip.classList.add("active");
+    }
+
+    chip.onclick = () => {
+      if (step.combo) {
+        respuestas[step.sheet] = respuestas[step.sheet] || { opcion: "", texto: "" };
+        respuestas[step.sheet].opcion = row.texto;
+        chips.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        // **NO desactiva el textarea**
+      } else {
+        respuestas[step.sheet] = respuestas[step.sheet] || [];
+        if (!step.multi) {
+          respuestas[step.sheet] = [row.texto];
+          chips.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+        } else {
+          if (respuestas[step.sheet].includes(row.texto)) {
+            respuestas[step.sheet] = respuestas[step.sheet].filter(v => v !== row.texto);
+            chip.classList.remove("active");
+          } else {
+            respuestas[step.sheet].push(row.texto);
+            chip.classList.add("active");
+          }
+        }
+      }
+
+      // FORMATO_RUBRICA especial
+      if (step.sheet === "FORMATO_RUBRICA") {
+        respuestas["_formatoRubroExtra"] =
+          row.texto.toUpperCase() === "UNA SITUACIÓN DE APRENDIZAJE"
+            ? "Genera la situación de aprendizaje"
+            : row.texto.toUpperCase() === "UNA PROGRAMACIÓN DE AULA PARA ESTA SDA"
+              ? "Genera una programación de aula para esta SdA"
+              : "";
+      }
+    };
+
+    chips.appendChild(chip);
+  });
+
+  cont.appendChild(chips);
+}
+
+function renderTextarea(step, cont) {
+  const textarea = document.createElement("textarea");
+  textarea.placeholder = step.placeholder || "Escribe tu respuesta aquí...";
+
+  if (step.combo) {
+    textarea.value = respuestas[step.sheet]?.texto || "";
+  } else if (step.text) {
+    textarea.value = typeof respuestas[step.sheet] === "string" ? respuestas[step.sheet] : "";
+  }
+
+  textarea.oninput = e => {
+    if (step.combo) {
+      respuestas[step.sheet] = respuestas[step.sheet] || { opcion: "", texto: "" };
+      respuestas[step.sheet].texto = e.target.value;
+      // **Importante: no desactiva los chips al escribir**
+    } else if (step.text) {
+      respuestas[step.sheet] = e.target.value;
+    }
+  };
+
+  textarea.style.marginTop = "20px";
+  cont.appendChild(textarea);
+}
+
+function nextStep(){
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    mostrarPaso();
+  } else {
+    generarPrompt();
+  }
+}
+
+function prevStep(){
+  if (currentStep > 0) {
+    currentStep--;
+    mostrarPaso();
+  }
+}
+
+function generarPrompt(){
+  let prompt = "";
+
+  steps.forEach(step => {
+    const data = respuestas[step.sheet];
+    if (!data || (Array.isArray(data) && data.length === 0)) return;
+
+    prompt += step.title + ":\n";
+
+    if (typeof data === "string") {
+      prompt += data + "\n\n";
+    } else if (Array.isArray(data)) {
+      data.forEach(v => prompt += "- " + v + "\n");
+      prompt += "\n";
+    } else if (typeof data === "object") {
+      if (data.opcion) prompt += "- " + data.opcion + "\n";
+      if (data.texto) prompt += data.texto + "\n";
+      prompt += "\n";
+    }
+  });
+
+  if (respuestas["_formatoRubroExtra"]) {
+    prompt += "\n" + respuestas["_formatoRubroExtra"];
+  }
+
+  document.getElementById("promptFinal").value = prompt;
+  document.getElementById("wizard").classList.add("hidden");
+  document.getElementById("resultado").style.display = "block";
+}
+
+function copiarPrompt(){
+  navigator.clipboard.writeText(document.getElementById("promptFinal").value);
+  alert("Prompt copiado correctamente");
+}
+function resetApp() {
+  location.reload();
+}
+
+</script>
+<footer id="fixedFooter">
+  Una herramienta pensada para docentes diseñada por José Manuel Sobrino Carrasco | Creative Commons.
+</footer>
+</body>
+</html>
