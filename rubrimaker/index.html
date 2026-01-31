@@ -433,15 +433,19 @@ function mostrarPaso(){
       if(step.sheet === "FORMATO_RUBRICA"){
         if(row.texto.toUpperCase() === "CLASSROOM"){
           respuestas["_formatoRubroExtra"] =
-`Genera una rúbrica en formato de Hoja de Cálculo de Google (Google Sheets) lista para importar en Google Classroom.
-La tabla debe tener cinco columnas (A a E). Incluye la fila de código v1.0-s en la celda A1.
-Cada criterio debe seguir esta estructura de seis filas obligatorias antes de pasar al siguiente criterio:
-1. Criterio X (columna A)
-2. Título del Criterio
-3. Fila vacía
-4. Puntuaciones
-5. Títulos de nivel
-6. Descripciones de nivel`;
+`Genera una rúbrica en formato de tabla lista para importar en Google Classroom/Sheets. En la tabla incluye las letras de la A a la E en la primera fila.  A continuación incluye obligatoriamente el código v1.0-s en la celda A2.”
+
+"A continuación, para cada criterio, sigue esta estructura exacta de cinco filas obligatorias y esta distribución descendente de puntuaciones antes de pasar al siguiente criterio:"
+
+Fila 1: Criterio X: (En columna A)
+
+Fila 2: Título del Criterio (En columna A)
+
+Fila 3 (Puntuación): 4.0 (B), 3.0 (C), 2.0 (D), 1.0 (E)
+
+Fila 4 (Título Nivel): Sobresaliente (B), Notable (C), Suficiente (D), Insuficiente (E)
+
+Fila 5 (Descripción): Descripción Sobresaliente (B), Descripción Notable (C), Descripción Suficiente (D), Descripción Insuficiente (E)`;
         } else if(row.texto.toUpperCase() === "RUBRIX"){
           respuestas["_formatoRubroExtra"] =
 `Genera la rúbrica en formato tabla con columnas:
