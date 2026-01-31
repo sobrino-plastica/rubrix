@@ -448,10 +448,14 @@ Fila 4 (Título Nivel): Sobresaliente (B), Notable (C), Suficiente (D), Insufici
 Fila 5 (Descripción): Descripción Sobresaliente (B), Descripción Notable (C), Descripción Suficiente (D), Descripción Insuficiente (E)`;
         } else if(row.texto.toUpperCase() === "RUBRIX"){
           respuestas["_formatoRubroExtra"] =
-`Genera la rúbrica en formato tabla con columnas:
-Criterio | Excelente | Bueno | Suficiente | Insuficiente | Peso.
-La suma de los pesos debe ser 100.
-Cada nivel debe incluir descripciones claras y breves.`;
+`"Genera la rúbrica de evaluación en formato tabla con las siguientes **columnas fijas**:
+Criterio | Excelente | Bueno | Suficiente | Insuficiente | Peso  (no incluyas números ni paréntesis en estas celdas, sólo la palabra indicada)
+
+- Cada fila representa un criterio de evaluación distinto.
+- El número de criterios (filas) puede variar según la necesidad.
+- Para cada nivel (Insuficiente, Suficiente, Bueno, Excelente) proporciona un **texto indicativo claro y breve** que describa el logro en ese nivel.
+- La columna ""Peso"" debe ser un número entero que indique la nota que ese criterio aporta a la nota final. La suma de todos los pesos debe ser 100.
+- Asegúrate de que todos los campos estén completos y que el formato sea fácil de copiar a Excel.  "`;
         } else {
           delete respuestas["_formatoRubroExtra"];
         }
