@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evalua+ | Proyecto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Raleway -->
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #f0f2f5; /* fondo gris suave */
+            color: #1e293b;
+        }
+
+        .content-wrapper {
+            max-width: 900px; /* ancho del card más amplio */
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 40px 30px;
+            max-width: 100%; /* se adapta al content-wrapper */
+            margin: 0 auto;
+            text-align: justify;
+        }
+
+        .card-inner {
+            max-width: 720px; /* ancho de lectura del texto */
+            margin: 0 auto;
+        }
+
+        p {
+            margin-bottom: 1.75rem;
+            line-height: 1.8;
+            font-size: 1.125rem;
+            color: #334155;
+        }
+
+        .highlight {
+            color: #2563eb;
+            font-weight: 700;
+            font-size: 15pt;
+        }
+
+        .privacy-highlight {
+            border-left: 4px solid #ff7800;
+            padding: 1.5rem 2rem;
+            background-color: #f1f5f9;
+            border-radius: 0 12px 12px 0;
+            margin: 2.5rem 0;
+            font-style: italic;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center; /* centra horizontalmente */
+            margin-top: 3rem;
+        }
+
+        .btn-return {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(100, 116, 139, 0.7);
+            border-radius: 8px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn-return:hover {
+            color: #2563eb;
+            transform: translateX(-5px);
+        }
+
+        .btn-return i {
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .logo-img {
+            max-width: 40%;
+            height: auto;
+            margin-bottom: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="card">
+            <div class="card-inner">
+                <header class="logo-container">
+                    <!-- Logotipo en formato PNG -->
+                    <img src="evalua-logo.png" alt="Evalua+" class="logo-img">
+                </header>
+
+                <main>
+                    <p>
+                        <span class="highlight">Evalúa+</span> es una plataforma educativa gratuita diseñada para acompañar al profesorado en el desarrollo de una evaluación verdaderamente competencial.
+                    </p>
+
+                    <p>
+                        El proyecto combina una serie de herramientas que permite diseñar situaciones de aprendizaje (SdAmaker), crear rúbricas competenciales (Rubrimaker) y realizar la evaluación a partir de dichas rúbricas de forma sencilla y autónoma (Rubrix).
+                    </p>
+
+                    <div class="privacy-highlight">
+                        Uno de sus principios fundamentales es el <strong>respeto absoluto por la privacidad</strong> y la soberanía de los datos: toda la información generada se almacena exclusivamente en el ordenador o dispositivo personal del docente, sin subir nunca datos a la nube.
+                    </div>
+
+                    <p>
+                        <span class="font-bold text-slate-900">Evalúa+</span> nace como una herramienta abierta, práctica y pensada desde el aula, para facilitar la planificación, la evaluación y la reflexión pedagógica en el marco de una educación competencial.
+                    </p>
+
+                    <!-- Botón centrado -->
+                    <div class="btn-container">
+                        <a href="../index.html" class="btn-return">
+                            <i class="fas fa-arrow-left"></i>
+                            Volver atrás
+                        </a>
+                    </div>
+                </main>
+
+                <footer>
+                    &copy; 2025 Proyecto evalua+ · Diseñada por José Manuel Sobrino Carrasco
+                </footer>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
