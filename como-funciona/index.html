@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¿Cómo funciona? - Guía de Configuración</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fuente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Raleway', sans-serif;
+      background-color: #f8fafc;
+    }
+
+    .bg-pattern {
+      background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px);
+      background-size: 24px 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 2.5rem;
+      padding: 3rem;
+      border: 1px solid rgba(255,255,255,.8);
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,.12);
+      transition: transform .3s ease;
+      will-change: transform;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover {
+        transform: translateY(-8px);
+      }
+    }
+
+    .text-justified {
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .video-wrapper {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      background: #f1f5f9;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-pattern bg-slate-50">
+
+  <main class="max-w-4xl mx-auto px-4 md:px-12 py-16">
+
+    <div class="card">
+
+      <header class="mb-10">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">
+          ¿Cómo funciona?
+        </h1>
+      </header>
+
+      <section class="text-slate-600 text-lg md:text-xl space-y-6 mb-12 text-justified">
+        <h2 class="text-4xl font-extrabold text-slate-700">
+          Paso 1. Configura el currículo de tu materia.
+        </h2>
+
+        <p>
+          Para utilizar las distintas herramientas
+          <span class="font-bold text-blue-600">necesitarás configurar antes tus propios currículos</span>.
+          No es difícil, pero de momento es un pequeño
+          <span class="font-bold text-blue-600">do it yourself</span>.
+        </p>
+
+        <p>
+          Haz click en el botón y descarga la plantilla
+          <span class="text-blue-500 font-bold text-2xl">;)</span>.
+          Es un archivo <span class="bg-slate-100 px-2 py-0.5 rounded font-mono border">.excel</span>. En el siguiente video te explico cómo configurarla de forma sencilla.
+        </p>
+      </section>
+
+      <div class="flex flex-col sm:flex-row gap-5 mb-14">
+        <button onclick="window.open('https://docs.google.com/spreadsheets/d/1lhU1yAhUT495SMFVzSkPrksz3fQk9fzz/edit?usp=sharing&ouid=102958333800648375311&rtpof=true&sd=true', '_blank')"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition active:scale-95">
+          <i data-lucide="download"></i>
+          Descargar plantilla ESO
+        </button>
+
+        <button onclick="window.open('https://docs.google.com/spreadsheets/d/1v43BLggJQXxuE-qILA6C2IBtej9ioIru/edit?usp=sharing&ouid=102958333800648375311&rtpof=true&sd=true', '_blank')"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition active:scale-95">
+          <i data-lucide="download"></i>
+          Descargar plantilla Bachillerato
+        </button>
+
+        <a href="prompts.html" target="_blank"
+          class="flex-1 border-2 border-slate-200 hover:border-blue-600 hover:text-blue-600 px-8 py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition">
+          <i data-lucide="code"></i>
+          Ver prompts
+        </a>
+      </div>
+
+      <div class="space-y-6 pt-10 border-t">
+        <div class="flex items-center justify-between text-slate-400">
+          <span class="font-bold uppercase tracking-widest text-sm">
+            Tutorial para configurar tu currículo en .excel
+          </span>
+          <a href="https://youtu.be/E_FVX0KxHWI" target="_blank" class="text-blue-500 font-bold">
+            Abrir en YouTube
+          </a>
+        </div>
+
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/E_FVX0KxHWI"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+    </div>
+</br>
+
+
+    <div class="card">
+
+      <header class="mb-10">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">
+          ¿Cómo funciona <span style="color: orange;">SdAmaker?</span>
+        </h1>
+      </header>
+    <section class="text-slate-600 text-lg md:text-xl space-y-6 mb-12 text-justified">
+
+      <p>
+        Una vez configurado tu currículo en <span class="bg-slate-100 px-2 py-0.5 rounded font-mono border">.excel</span>, lo demás es coser y cantar. Mira las instrucciones del siguiente video. Son muy cortas. </br>Realmente todo lo que era difícil ya está hecho. ;)
+
+      </p>
+    </section>
+
+    <div class="space-y-6 pt-10 border-t">
+      <div class="flex items-center justify-between text-slate-400">
+        <span class="font-bold uppercase tracking-widest text-sm">
+          Tutorial SdAmaker
+        </span>
+        <a href="https://youtu.be/E_FVX0KxHWI" target="_blank" class="text-blue-500 font-bold">
+          Abrir en YouTube
+        </a>
+      </div>
+
+      <div class="video-wrapper">
+        <iframe
+          src="https://www.youtube.com/embed/E_FVX0KxHWI"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+  </div>
+</br>
+  <div class="card">
+
+    <header class="mb-10">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">
+        ¿Cómo funciona <span style="color: blue;">Rubrimaker?</span>
+      </h1>
+    </header>
+  <section class="text-slate-600 text-lg md:text-xl space-y-6 mb-12 text-justified">
+
+    <p>
+    Pues es más de lo mismo. Funciona exactamente igual que <span style="color: orange;">SdAmaker</span>. </br>Simplemente cargas tu currículo configurado y tendrás que ir seleccionando lo que te pregunte la app. Al final te generará un prompt que tendrás que pegar en Gemini o ChatGPT. </br> Por si acaso, te dejo unas instrucciones en video. Son muy cortas ;).
+
+    </p>
+  </section>
+
+  <div class="space-y-6 pt-10 border-t">
+    <div class="flex items-center justify-between text-slate-400">
+      <span class="font-bold uppercase tracking-widest text-sm">
+        Tutorial Rubrimaker
+      </span>
+      <a href="https://youtu.be/E_FVX0KxHWI" target="_blank" class="text-blue-500 font-bold">
+        Abrir en YouTube
+      </a>
+    </div>
+
+    <div class="video-wrapper">
+      <iframe
+        src="https://www.youtube.com/embed/E_FVX0KxHWI"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+</div>
+
+    <footer class="mt-12 text-center">
+        <p class="text-slate-400 text-sm font-medium">
+            © 2026 Proyecto evalua+ • Hecho por José Manuel Sobrino Carrasco con <span class="text-red-400">❤</span> para docentes
+        </p>
+    </footer>
+
+  </main>
+  <button onclick="window.location.href='../index.html'"
+          class="fixed right-6 bottom-6 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition flex items-center gap-2 z-50">
+    <!-- Icono de flecha hacia la izquierda -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-5 h-5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Volver atrás
+  </button>
+  <script>
+    lucide.createIcons();
+  </script>
+
+</body>
+</html>
